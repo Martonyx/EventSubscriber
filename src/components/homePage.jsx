@@ -6,18 +6,21 @@ import {
   SimpleGrid,
   Text,
   Input,
+  Button,
 } from "@chakra-ui/react";
-import { Web3Button } from "@thirdweb-dev/react";
+
 import { useState } from "react";
 import { ethers } from "ethers";
 
 import Instructions from "./instructions";
 
 export default function HomePage() {
+  const [loading, setLoading] = useState(false);
   const [contractAddress, setContractAddress] = useState("");
   const [logs, setLogs] = useState([]);
 
   const fetchLogs = async () => {
+    setLoading(true);
     const provider = new ethers.providers.JsonRpcProvider(
       "https://dapps.shardeum.org"
     );
@@ -28,9 +31,10 @@ export default function HomePage() {
 
     const fetchedLogs = await provider.getLogs(filter);
     setLogs(fetchedLogs);
-    console.log(logs);
+    setLoading(false);
   };
 
+  const isempty = contractAddress === "";
   return (
     <Container maxW={"1400px"} py={8}>
       <Instructions />
@@ -47,14 +51,9 @@ export default function HomePage() {
             placeholder="Contracts Address"
           ></Input>
           <Divider my={"5"} />
-          <Web3Button
-            contractAddress={contractAddress}
-            action={() => {
-              fetchLogs();
-            }}
-          >
+          <Button onClick={fetchLogs} isDisabled={isempty}>
             Fetch Events
-          </Web3Button>
+          </Button>
         </Box>
         <Container>
           {logs.length > 0 ? (
@@ -68,6 +67,10 @@ export default function HomePage() {
                 <Text>TransactionHash: {log.transactionHash}</Text>
               </Card>
             ))
+          ) : loading ? (
+            <Text fontSize={"2xl"} fontWeight={"bold"} color={"blue.500"}>
+              Loading...
+            </Text>
           ) : (
             <Text fontSize={"2xl"} fontWeight={"bold"} color={"blue.500"}>
               No Events to display
