@@ -49,7 +49,7 @@ export default function HomePage() {
           <Divider my={"5"} />
           <Web3Button
             contractAddress={contractAddress}
-            action={async () => {
+            action={() => {
               fetchLogs();
             }}
           >
